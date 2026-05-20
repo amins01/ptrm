@@ -1,33 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="Deformable Neural Radiance Fields creates free-viewpoint portraits (nerfies) from casually captured videos.">
-  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
+        content="Probabilistic Tiny Recursive Model: scale recursive reasoning models at inference by injecting noise into the latent state and selecting the best of K rollouts using the model's own Q head (no retraining, no task-specific tricks).">
+  <meta name="keywords" content="PTRM, TRM, Tiny Recursive Model, Probabilistic TRM, recursive reasoning, test-time scaling, Sudoku, ARC-AGI, PPBench, latent reasoning">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nerfies: Deformable Neural Radiance Fields</title>
+  <title>Probabilistic Tiny Recursive Model</title>
 
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag('config', 'G-PYVRSFMDRL');
-  </script>
+  <meta property="og:title" content="Probabilistic Tiny Recursive Model">
+  <meta property="og:description" content="Inference-time noise injection and Q head selection unlock substantial gains on hard puzzles without retraining (using a pretrained TRM checkpoint).">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Probabilistic Tiny Recursive Model">
+  <meta name="twitter:description" content="Inference-time noise injection and Q head selection unlock substantial gains on hard puzzles without retraining (using a pretrained TRM checkpoint).">
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
 
   <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
@@ -36,8 +27,6 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
   <script src="./static/js/index.js"></script>
 </head>
 <body>
@@ -50,77 +39,37 @@
       <span aria-hidden="true"></span>
     </a>
   </div>
-  <div class="navbar-menu">
-    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-      <a class="navbar-item" href="https://keunhong.com">
-      <span class="icon">
-          <i class="fas fa-home"></i>
-      </span>
-      </a>
-
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          More Research
-        </a>
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="https://hypernerf.github.io">
-            HyperNeRF
-          </a>
-          <a class="navbar-item" href="https://nerfies.github.io">
-            Nerfies
-          </a>
-          <a class="navbar-item" href="https://latentfusion.github.io">
-            LatentFusion
-          </a>
-          <a class="navbar-item" href="https://photoshape.github.io">
-            PhotoShape
-          </a>
-        </div>
-      </div>
-    </div>
-
-  </div>
 </nav>
 
 
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-body">
+  <div class="hero-body pb-1">
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">Nerfies: Deformable Neural Radiance Fields</h1>
+          <h1 class="title is-1 publication-title">Probabilistic Tiny Recursive Model</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              <a href="https://keunhong.com">Keunhong Park</a><sup>1</sup>,</span>
+              <a href="#">Amin Sghaier</a><sup>1, 2</sup>,</span>
             <span class="author-block">
-              <a href="https://utkarshsinha.com">Utkarsh Sinha</a><sup>2</sup>,</span>
+              <a href="#">Ali Parviz</a><sup>1</sup>,</span>
             <span class="author-block">
-              <a href="https://jonbarron.info">Jonathan T. Barron</a><sup>2</sup>,
-            </span>
-            <span class="author-block">
-              <a href="http://sofienbouaziz.com">Sofien Bouaziz</a><sup>2</sup>,
-            </span>
-            <span class="author-block">
-              <a href="https://www.danbgoldman.com">Dan B Goldman</a><sup>2</sup>,
-            </span>
-            <span class="author-block">
-              <a href="https://homes.cs.washington.edu/~seitz/">Steven M. Seitz</a><sup>1,2</sup>,
-            </span>
-            <span class="author-block">
-              <a href="http://www.ricardomartinbrualla.com">Ricardo Martin-Brualla</a><sup>2</sup>
+              <a href="#">Alexia Jolicoeur-Martineau</a><sup>3</sup>
             </span>
           </div>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup>University of Washington,</span>
-            <span class="author-block"><sup>2</sup>Google Research</span>
+            <span class="author-block"><sup>1</sup>Mila – Quebec AI Institute</span>
+            <span class="author-block"><sup>2</sup>ILLS & ETS Montreal</span>
+            <span class="author-block"><sup>3</sup>Independent</span>
           </div>
 
           <div class="column has-text-centered">
             <div class="publication-links">
-              <!-- PDF Link. -->
+              <!-- Paper -->
               <span class="link-block">
-                <a href="https://arxiv.org/pdf/2011.12948"
+                <a href="https://arxiv.org/pdf/2605.19943"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fas fa-file-pdf"></i>
@@ -128,8 +77,9 @@
                   <span>Paper</span>
                 </a>
               </span>
+              <!-- arXiv -->
               <span class="link-block">
-                <a href="https://arxiv.org/abs/2011.12948"
+                <a href="https://arxiv.org/abs/2605.19943"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="ai ai-arxiv"></i>
@@ -137,112 +87,37 @@
                   <span>arXiv</span>
                 </a>
               </span>
-              <!-- Video Link. -->
+              <!-- Code -->
               <span class="link-block">
-                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-youtube"></i>
-                  </span>
-                  <span>Video</span>
-                </a>
-              </span>
-              <!-- Code Link. -->
-              <span class="link-block">
-                <a href="https://github.com/google/nerfies"
+                <a href="https://github.com/amins01/probabilistic-trm"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fab fa-github"></i>
                   </span>
                   <span>Code</span>
-                  </a>
+                </a>
               </span>
-              <!-- Dataset Link. -->
               <span class="link-block">
-                <a href="https://github.com/google/nerfies/releases/tag/0.1"
+                <a href="#BibTeX"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
-                      <i class="far fa-images"></i>
+                      <i class="fas fa-quote-left"></i>
                   </span>
-                  <span>Data</span>
-                  </a>
+                  <span>BibTeX</span>
+                </a>
+              </span>
             </div>
-
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <video id="teaser" autoplay muted loop playsinline height="100%">
-        <source src="./static/videos/teaser.mp4"
-                type="video/mp4">
-      </video>
-      <h2 class="subtitle has-text-centered">
-        <span class="dnerf">Nerfies</span> turns selfie videos from your phone into
-        free-viewpoint
-        portraits.
-      </h2>
-    </div>
-  </div>
-</section>
+          <!-- Headline bar chart -->
+          <div class="columns is-centered">
+            <div class="column">
+              <figure class="paper-figure">
+                <img src="./static/images/headline_bar.png" alt="PTRM performance comparison across benchmarks">
+              </figure>
+            </div>
+          </div>
 
-
-<section class="hero is-light is-small">
-  <div class="hero-body">
-    <div class="container">
-      <div id="results-carousel" class="carousel results-carousel">
-        <div class="item item-steve">
-          <video poster="" id="steve" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/steve.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-chair-tp">
-          <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/chair-tp.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-shiba">
-          <video poster="" id="shiba" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/shiba.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-fullbody">
-          <video poster="" id="fullbody" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/fullbody.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-blueshirt">
-          <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/blueshirt.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-mask">
-          <video poster="" id="mask" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/mask.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-coffee">
-          <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/coffee.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-toby">
-          <video poster="" id="toby" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/toby2.mp4"
-                    type="video/mp4">
-          </video>
         </div>
       </div>
     </div>
@@ -250,218 +125,322 @@
 </section>
 
 
+<!-- ABSTRACT + HEADLINE -->
 <section class="section">
   <div class="container is-max-desktop">
-    <!-- Abstract. -->
+
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
-          <p>
-            We present the first method capable of photorealistically reconstructing a non-rigidly
-            deforming scene using photos/videos captured casually from mobile phones.
-          </p>
-          <p>
-            Our approach augments neural radiance fields
-            (NeRF) by optimizing an
-            additional continuous volumetric deformation field that warps each observed point into a
-            canonical 5D NeRF.
-            We observe that these NeRF-like deformation fields are prone to local minima, and
-            propose a coarse-to-fine optimization method for coordinate-based models that allows for
-            more robust optimization.
-            By adapting principles from geometry processing and physical simulation to NeRF-like
-            models, we propose an elastic regularization of the deformation field that further
-            improves robustness.
-          </p>
-          <p>
-            We show that <span class="dnerf">Nerfies</span> can turn casually captured selfie
-            photos/videos into deformable NeRF
-            models that allow for photorealistic renderings of the subject from arbitrary
-            viewpoints, which we dub <i>"nerfies"</i>. We evaluate our method by collecting data
-            using a
-            rig with two mobile phones that take time-synchronized photos, yielding train/validation
-            images of the same pose at different viewpoints. We show that our method faithfully
-            reconstructs non-rigidly deforming scenes and reproduces unseen views with high
-            fidelity.
-          </p>
+          Tiny Recursive Models (TRM) solve complex reasoning tasks with a fraction of
+          the parameters of modern large language models (LLMs) by iteratively refining a
+          latent state and final answer. While powerful, their deterministic recursion can lead
+          to convergence at suboptimal solutions, without escape mechanism. A common
+          workaround relies on task-specific input perturbations at test time combined with
+          answer aggregation via voting. We introduce <strong>Probabilistic TRM (PTRM)</strong>, 
+          a task-agnostic framework for test-time compute scaling that addresses this limitation
+          through stochastic exploration. PTRM injects Gaussian noise at each deep recursion
+          step, enabling parallel trajectories to explore diverse solution basins, and selects
+          among them using the model's existing Q head (used for early stopping in the
+          original TRM). Without requiring retraining or task-specific augmentations, PTRM
+          enables substantial accuracy gains across benchmarks, including Sudoku-Extreme
+          (87.4% to 98.75%) and on various puzzles from Pencil Puzzle Bench (62.6% to
+          91.2%). On the latter, PTRM achieves nearly double the accuracy of frontier LLMs
+          (91.2% vs. 55.1%) at less than 0.0001x the cost, using only 7M parameters.
         </div>
       </div>
     </div>
-    <!--/ Abstract. -->
 
-    <!-- Paper video. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Video</h2>
-        <div class="publication-video">
-          <iframe src="https://www.youtube.com/embed/MrKrnHhk8IA?rel=0&amp;showinfo=0"
-                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </div>
-      </div>
-    </div>
-    <!--/ Paper video. -->
   </div>
 </section>
 
 
-<section class="section">
+<!-- MOTIVATION -->
+<section class="section motivation">
   <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">When does TRM fail?</h2>
 
-    <div class="columns is-centered">
-
-      <!-- Visual Effects. -->
-      <div class="column">
-        <div class="content">
-          <h2 class="title is-3">Visual Effects</h2>
-          <p>
-            Using <i>nerfies</i> you can create fun visual effects. This Dolly zoom effect
-            would be impossible without nerfies since it would require going through a wall.
-          </p>
-          <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/dollyzoom-stacked.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-      </div>
-      <!--/ Visual Effects. -->
-
-      <!-- Matting. -->
-      <div class="column">
-        <h2 class="title is-3">Matting</h2>
-        <div class="columns is-centered">
-          <div class="column content">
-            <p>
-              As a byproduct of our method, we can also solve the matting problem by ignoring
-              samples that fall outside of a bounding box during rendering.
-            </p>
-            <video id="matting-video" controls playsinline height="100%">
-              <source src="./static/videos/matting.mp4"
-                      type="video/mp4">
-            </video>
-          </div>
-
-        </div>
-      </div>
+    <div class="content">
+      <p>
+        We trained a TRM on various Pencil Puzzle Bench (PPBench) puzzles (sudoku, lightup, nurikabe, 
+        shakashaka, heyawake, and tapa) and analyzed its latent dynamics across supervision steps on held-out puzzles.
+        By projecting the latent state at each step into its principal plane, we observe three distinct
+        trajectory modes:
+      </p>
+      <ul>
+        <li>
+          <strong>Quick success.</strong> The trajectory quickly converges to a good basin in latent space
+          (region where the decoded answer is correct).
+        </li>
+        <li>
+          <strong>Delayed success.</strong> The trajectory oscillates in a bad basin for many
+          supervision steps, then escapes to a good basin where it converges.
+        </li>
+        <li>
+          <strong>Failure.</strong> The trajectory oscillates in a bad basin without converging.
+        </li>
+      </ul>
+      <p>
+        As shown by the delayed-success mode, trajectories that initially look like failures
+        sometimes end up escaping and finding a correct answer. This suggests many failed trajectories 
+        could be stuck in escapable local optima.
+      </p>
     </div>
-    <!--/ Matting. -->
 
-    <!-- Animation. -->
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Animation</h2>
-
-        <!-- Interpolating. -->
-        <h3 class="title is-4">Interpolating states</h3>
-        <div class="content has-text-justified">
-          <p>
-            We can also animate the scene by interpolating the deformation latent codes of two input
-            frames. Use the slider here to linearly interpolate between the left frame and the right
-            frame.
-          </p>
-        </div>
-        <div class="columns is-vcentered interpolation-panel">
-          <div class="column is-3 has-text-centered">
-            <img src="./static/images/interpolate_start.jpg"
-                 class="interpolation-image"
-                 alt="Interpolate start reference image."/>
-            <p>Start Frame</p>
-          </div>
-          <div class="column interpolation-video-column">
-            <div id="interpolation-image-wrapper">
-              Loading...
-            </div>
-            <input class="slider is-fullwidth is-large is-info"
-                   id="interpolation-slider"
-                   step="1" min="0" max="100" value="0" type="range">
-          </div>
-          <div class="column is-3 has-text-centered">
-            <img src="./static/images/interpolate_end.jpg"
-                 class="interpolation-image"
-                 alt="Interpolation end reference image."/>
-            <p class="is-bold">End Frame</p>
-          </div>
-        </div>
-        <br/>
-        <!--/ Interpolating. -->
-
-        <!-- Re-rendering. -->
-        <h3 class="title is-4">Re-rendering the input video</h3>
-        <div class="content has-text-justified">
-          <p>
-            Using <span class="dnerf">Nerfies</span>, you can re-render a video from a novel
-            viewpoint such as a stabilized camera by playing back the training deformations.
-          </p>
-        </div>
-        <div class="content has-text-centered">
-          <video id="replay-video"
-                 controls
-                 muted
-                 preload
-                 playsinline
-                 width="75%">
-            <source src="./static/videos/replay.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <!--/ Re-rendering. -->
-
-      </div>
+    <div class="animation-slot">
+      <video autoplay loop muted playsinline>
+        <source src="./static/videos/anim_basins.mp4" type="video/mp4">
+      </video>
     </div>
-    <!--/ Animation. -->
 
-
-    <!-- Concurrent Work. -->
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Related Links</h2>
-
-        <div class="content has-text-justified">
-          <p>
-            There's a lot of excellent work that was introduced around the same time as ours.
-          </p>
-          <p>
-            <a href="https://arxiv.org/abs/2104.09125">Progressive Encoding for Neural Optimization</a> introduces an idea similar to our windowed position encoding for coarse-to-fine optimization.
-          </p>
-          <p>
-            <a href="https://www.albertpumarola.com/research/D-NeRF/index.html">D-NeRF</a> and <a href="https://gvv.mpi-inf.mpg.de/projects/nonrigid_nerf/">NR-NeRF</a>
-            both use deformation fields to model non-rigid scenes.
-          </p>
-          <p>
-            Some works model videos with a NeRF by directly modulating the density, such as <a href="https://video-nerf.github.io/">Video-NeRF</a>, <a href="https://www.cs.cornell.edu/~zl548/NSFF/">NSFF</a>, and <a href="https://neural-3d-video.github.io/">DyNeRF</a>
-          </p>
-          <p>
-            There are probably many more by the time you are reading this. Check out <a href="https://dellaert.github.io/NeRF/">Frank Dellart's survey on recent NeRF papers</a>, and <a href="https://github.com/yenchenlin/awesome-NeRF">Yen-Chen Lin's curated list of NeRF papers</a>.
-          </p>
-        </div>
-      </div>
+    <div class="content section-spacer">
+      <h3 class="title is-4">The Q head often knows</h3>
+      <p>
+        TRM has a learned correctness signal it isn't using. The Q head is trained jointly with
+        the model to predict whether the prediction at each supervision step is correct.
+        It's traditionally only used during training for early stopping and discarded during inference.
+        We observe that the Q head accurately separates correct from incorrect trajectories.
+      </p>
     </div>
-    <!--/ Concurrent Work. -->
+
+    <div class="animation-slot">
+      <video autoplay loop muted playsinline>
+        <source src="./static/videos/anim_qhead.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <div class="content section-spacer">
+      <p>
+        Two observations come together here. First, many failures might just be caused by the model
+        being stuck in escapable local optima (as opposed to being inherently incapable of finding the correct answer).
+        Second, the Q head can identify whether an answer is correct or not. A natural question thus follows: 
+        <strong>can we sample multiple trajectories for the same puzzle and pick one based on the Q head output?</strong>
+      </p>
+    </div>
 
   </div>
 </section>
 
 
+<!-- METHOD -->
+<section class="section method has-background-light-gray">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">PTRM: Stochastic Rollouts + Q Selection</h2>
+
+    <div class="content">
+      <p>
+        PTRM consists of a simple change to TRM inference: (1) inject Gaussian noise of scale
+        <em>&sigma;</em> into the latent state at every recursion step, and (2) run <em>K</em>
+        rollouts per puzzle in parallel, then select the rollout whose final state has the
+        highest Q value. The recurrent noise causes rollouts to diverge into different basins and
+        the Q head picks the winner. This method doesn't require any training changes or task-specific augmentation.
+      </p>
+    </div>
+
+    <div class="columns method-block">
+      <div class="column is-three-sevenths">
+        <div class="pseudocode">
+          <div class="pseudocode-header">PTRM Inference</div>
+          <pre><code><strong>Input:</strong> puzzle <em>x</em>, rollouts <em>K</em>,
+       supervision steps <em>D</em>, noise scale <em>&sigma;</em>
+
+<strong>for</strong> <em>k</em> = 1, …, <em>K</em> <strong>in parallel:</strong>
+   initialize <em>z</em>₀⁽ᵏ⁾, <em>y</em>₀⁽ᵏ⁾
+   <strong>for</strong> <em>t</em> = 1, …, <em>D</em>:
+      <em>z</em>₍ₜ₋₁₎⁽ᵏ⁾ ← <em>z</em>₍ₜ₋₁₎⁽ᵏ⁾ + <em>&epsilon;</em>, <em>&epsilon;</em> ~ 𝒩(0, <em>&sigma;</em>²I)
+      <em>z</em>ₜ⁽ᵏ⁾, <em>y</em>ₜ⁽ᵏ⁾ ← rec(<em>x</em>, <em>z</em>₍ₜ₋₁₎⁽ᵏ⁾, <em>y</em>₍ₜ₋₁₎⁽ᵏ⁾)
+   <em>ŷ</em>⁽ᵏ⁾ ← argmax <em>f</em><sub><em>O</em></sub>(<em>y</em><sub><em>D</em></sub>⁽ᵏ⁾)
+   <em>q̂</em>⁽ᵏ⁾ ← <em>f</em><sub><em>Q</em></sub>(<em>y</em><sub><em>D</em></sub>⁽ᵏ⁾)
+<strong>return</strong> <em>ŷ</em>⁽ᵏ*⁾, where <em>k*</em> = argmax<sub><em>k</em></sub> <em>q̂</em>⁽ᵏ⁾</code></pre>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="animation-slot">
+          <img src="./static/images/method_diagram.svg" alt="PCA projection of K rollouts on a previously-failed puzzle">
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="animation-slot">
+        <video autoplay loop muted playsinline>
+          <source src="./static/videos/anim_method.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="section results">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Results</h2>
+
+    <div class="content">
+      <h3 class="title is-4">Width scaling axis</h3>
+      <p>
+        Our method unlocks a new test-time scaling axis (by scaling the number of rollouts <em>K</em>) 
+        that complements TRM's existing depth axis. 
+        Both pass@<em>K</em> (oracle selection) and best-Q@<em>K</em> (Q head selection)
+        rise smoothly with <em>K</em>. On PPBench puzzles, the Q head selection nearly matches the oracle verifier, while mode@K (most frequent answer) stays mostly flat.
+      </p>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-half">
+        <figure class="paper-figure">
+          <img src="./static/images/width_scaling.png" alt="Width scaling: pass@K and best-Q@K">
+        </figure>
+      </div>
+    </div>
+
+    <div class="content section-spacer">
+      <h3 class="title is-4">Per-puzzle accuracy on PPBench</h3>
+      <p>
+        Harder puzzle types where the deterministic baseline performs poorly (e.g., sudoku and tapa) see the biggest improvements.
+      </p>
+    </div>
+
+    <div class="results-table-wrapper">
+      <table class="table is-fullwidth is-striped is-narrow">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th class="has-text-centered">Sudoku</th>
+            <th class="has-text-centered">Lightup</th>
+            <th class="has-text-centered">Nurikabe</th>
+            <th class="has-text-centered">Heyawake</th>
+            <th class="has-text-centered">Tapa</th>
+            <th class="has-text-centered"><strong>Aggregate</strong></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Direct prediction (27M)</td>
+            <td class="has-text-centered">0.0</td>
+            <td class="has-text-centered">0.0</td>
+            <td class="has-text-centered">0.0</td>
+            <td class="has-text-centered">14.3</td>
+            <td class="has-text-centered">0.0</td>
+            <td class="has-text-centered">2.0</td>
+          </tr>
+          <tr>
+            <td>TRM, deterministic (7M)</td>
+            <td class="has-text-centered">46.7</td>
+            <td class="has-text-centered">87.5</td>
+            <td class="has-text-centered">74.1</td>
+            <td class="has-text-centered"><strong>85.7</strong></td>
+            <td class="has-text-centered">40.0</td>
+            <td class="has-text-centered">62.6</td>
+          </tr>
+          <tr>
+            <td>Strongest LLM (claude-opus-4-6)</td>
+            <td class="has-text-centered">0.0</td>
+            <td class="has-text-centered">87.5</td>
+            <td class="has-text-centered">44.4</td>
+            <td class="has-text-centered">0.0</td>
+            <td class="has-text-centered">60.0</td>
+            <td class="has-text-centered">34.7</td>
+          </tr>
+          <tr>
+            <td>LLM ensemble<sup>&dagger;</sup></td>
+            <td class="has-text-centered">46.7</td>
+            <td class="has-text-centered"><strong>100</strong></td>
+            <td class="has-text-centered">44.4</td>
+            <td class="has-text-centered">0.0</td>
+            <td class="has-text-centered"><strong>80.0</strong></td>
+            <td class="has-text-centered">55.1</td>
+          </tr>
+          <tr class="ours-row">
+            <td><strong>PTRM (ours, 7M)</strong></td>
+            <td class="has-text-centered"><strong>97.8</strong></td>
+            <td class="has-text-centered"><strong>100</strong></td>
+            <td class="has-text-centered"><strong>88.9</strong></td>
+            <td class="has-text-centered"><strong>85.7</strong></td>
+            <td class="has-text-centered"><strong>80.0</strong></td>
+            <td class="has-text-centered"><strong>91.2</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">
+        Accuracy (%) on subset of the PPBench golden set. <sup>&dagger;</sup>Assumes a perfect verifier across the seven
+        strongest LLMs.
+      </p>
+    </div>
+
+    <div class="content section-spacer">
+      <h3 class="title is-4">Beyond PPBench</h3>
+      <p>
+        The same recipe transfers to other benchmarks:
+      </p>
+    </div>
+
+    <div class="columns benchmark-cards">
+      <div class="column">
+        <div class="benchmark-card">
+          <div class="benchmark-name">Sudoku-Extreme</div>
+          <div class="benchmark-numbers">
+            <span class="before">87.3</span>
+            <span class="arrow">&rarr;</span>
+            <span class="after">98.75</span>
+          </div>
+          <div class="benchmark-delta">+11.5 pp</div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="benchmark-card">
+          <div class="benchmark-name">Maze-Hard</div>
+          <div class="benchmark-numbers">
+            <span class="before">83.8</span>
+            <span class="arrow">&rarr;</span>
+            <span class="after">86.7</span>
+          </div>
+          <div class="benchmark-delta">+2.9 pp</div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="benchmark-card">
+          <div class="benchmark-name">ARC-AGI-2 pass@1</div>
+          <div class="benchmark-numbers">
+            <span class="before">7.36</span>
+            <span class="arrow">&rarr;</span>
+            <span class="after">8.47</span>
+          </div>
+          <div class="benchmark-delta">+1.1 pp</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- CITATION -->
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
     <h2 class="title">BibTeX</h2>
-    <pre><code>@article{park2021nerfies,
-  author    = {Park, Keunhong and Sinha, Utkarsh and Barron, Jonathan T. and Bouaziz, Sofien and Goldman, Dan B and Seitz, Steven M. and Martin-Brualla, Ricardo},
-  title     = {Nerfies: Deformable Neural Radiance Fields},
-  journal   = {ICCV},
-  year      = {2021},
+    <pre><code>@misc{sghaier2026probabilistictinyrecursivemodel,
+      title={Probabilistic Tiny Recursive Model}, 
+      author={Amin Sghaier and Ali Parviz and Alexia Jolicoeur-Martineau},
+      year={2026},
+      eprint={2605.19943},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2605.19943}, 
 }</code></pre>
   </div>
 </section>
 
-
+<!-- FOOTER -->
 <footer class="footer">
   <div class="container">
     <div class="content has-text-centered">
-      <a class="icon-link"
-         href="./static/videos/nerfies_paper.pdf">
+      <a class="icon-link" href="https://arxiv.org/pdf/2605.19943">
         <i class="fas fa-file-pdf"></i>
       </a>
-      <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+      <a class="icon-link" href="https://github.com/amins01/probabilistic-trm">
         <i class="fab fa-github"></i>
       </a>
     </div>
@@ -469,16 +448,13 @@
       <div class="column is-8">
         <div class="content">
           <p>
-            This website is licensed under a <a rel="license"
-                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
+            This website is licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+              Creative Commons Attribution-ShareAlike 4.0 International License</a>.
           </p>
           <p>
-            This means you are free to borrow the <a
-              href="https://github.com/nerfies/nerfies.github.io">source code</a> of this website,
-            we just ask that you link back to this page in the footer.
-            Please remember to remove the analytics code included in the header of the website which
-            you do not want on your website.
+            The source code is borrowed from the
+            <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page.
           </p>
         </div>
       </div>

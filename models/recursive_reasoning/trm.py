@@ -8,7 +8,7 @@ from torch import nn
 from pydantic import BaseModel
 import random
 from models.common import trunc_normal_init_
-from models.layers import rms_norm, LinearSwish, SwiGLU, Attention, RotaryEmbedding, CosSin, CastedEmbedding, CastedLinear
+from models.layers import rms_norm, LinearSwish, SwiGLU, Attention, RotaryEmbedding, RotaryEmbedding2D, CosSin, CastedEmbedding, CastedLinear
 from models.sparse_embedding import CastedSparseEmbedding
 
 IGNORE_LABEL_ID = -100
@@ -141,6 +141,14 @@ class TinyRecursiveReasoningModel_ACTV1_Inner(nn.Module):
             self.rotary_emb = RotaryEmbedding(dim=self.config.hidden_size // self.config.num_heads,
                                               max_position_embeddings=self.config.seq_len + self.puzzle_emb_len,
                                               base=self.config.rope_theta)
+        elif self.config.pos_encodings == "rope2d":
+            grid_size = int(math.sqrt(self.config.seq_len))
+            assert grid_size * grid_size == self.config.seq_len, \
+                f"2D RoPE requires seq_len ({self.config.seq_len}) to be a perfect square"
+            self.rotary_emb = RotaryEmbedding2D(dim=self.config.hidden_size // self.config.num_heads,
+                                                prefix_len=self.puzzle_emb_len,
+                                                max_grid_size=grid_size,
+                                                base=self.config.rope_theta)
         elif self.config.pos_encodings == "learned":
             self.embed_pos = CastedEmbedding(self.config.seq_len + self.puzzle_emb_len, self.config.hidden_size, init_std=embed_init_std, cast_to=self.forward_dtype)
         else:

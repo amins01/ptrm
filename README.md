@@ -1,196 +1,129 @@
-**Update: Due to many automatically generated and irrelevant issues submitted to this repo (that have been deleted now) and our limited capacity to properly maintain this repo, we have to temporaliy archive (make read-only) this and several other repos.**
+# Probabilistic Tiny Recursive Model (PTRM)
 
+Official code for **Probabilistic Tiny Recursive Model** (NeurIPS 2026).
 
-# Less is More: Recursive Reasoning with Tiny Networks
+PTRM scales test-time compute of a trained [Tiny Recursive Model (TRM)](https://github.com/SamsungSAILMontreal/TinyRecursiveModels) by running K rollouts in parallel, adding Gaussian noise to the latent state at every supervision step so that they follow different trajectories, and selecting one answer according to a criterion (e.g., the model's existing Q head).
 
-This is the codebase for the paper: "Less is More: Recursive Reasoning with Tiny Networks". TRM is a recursive reasoning approach that achieves amazing scores of 45% on ARC-AGI-1 and 8% on ARC-AGI-2 using a tiny 7M parameters neural network.
-
-[Paper](https://arxiv.org/abs/2510.04871)
-
-### Motivation
-
-Tiny Recursion Model (TRM) is a recursive reasoning model that achieves amazing scores of 45% on ARC-AGI-1 and 8% on ARC-AGI-2 with a tiny 7M parameters neural network. The idea that one must rely on massive foundational models trained for millions of dollars by some big corporation in order to achieve success on hard tasks is a trap. Currently, there is too much focus on exploiting LLMs rather than devising and expanding new lines of direction. With recursive reasoning, it turns out that “less is more”: you don’t always need to crank up model size in order for a model to reason and solve hard problems. A tiny model pretrained from scratch, recursing on itself and updating its answers over time, can achieve a lot without breaking the bank.
-
-This work came to be after I learned about the recent innovative Hierarchical Reasoning Model (HRM). I was amazed that an approach using small models could do so well on hard tasks like the ARC-AGI competition (reaching 40% accuracy when normally only Large Language Models could compete). But I kept thinking that it is too complicated, relying too much on biological arguments about the human brain, and that this recursive reasoning process could be greatly simplified and improved. Tiny Recursion Model (TRM) simplifies recursive reasoning to its core essence, which ultimately has nothing to do with the human brain, does not require any mathematical (fixed-point) theorem, nor any hierarchy.
-
-### How TRM works
+[![arXiv](https://img.shields.io/badge/arXiv-2605.19943-b31b1b.svg)](https://arxiv.org/abs/2605.19943)
+[![Project page](https://img.shields.io/badge/Project-Page-2a78d6.svg)](https://amins01.github.io/ptrm)
 
 <p align="center">
-  <img src="https://AlexiaJM.github.io/assets/images/TRM_fig.png" alt="TRM"  style="width: 30%;">
+  <img src="assets/method.png" alt="PTRM" style="width: 70%;">
 </p>
 
-Tiny Recursion Model (TRM) recursively improves its predicted answer y with a tiny network. It starts with the embedded input question x and initial embedded answer y and latent z. For up to K improvements steps, it tries to improve its answer y. It does so by i) recursively updating n times its latent z given the question x, current answer y, and current latent z (recursive reasoning), and then ii) updating its answer y given the current answer y and current latent z. This recursive process allows the model to progressively improve its answer (potentially addressing any errors from its previous answer) in an extremely parameter-efficient manner while minimizing overfitting.
+This repository is the original TRM code plus:
 
-### Requirements
+- `ptrm.py`: PTRM inference for any trained TRM checkpoint (K noisy rollouts; best-Q@K, mode@K, pass@K; Q-based halting).
+- 2D rotary position embeddings (`arch.pos_encodings=rope2d`), helps for PPBench.
+- Dataset builders for [Pencil Puzzle Bench](https://arxiv.org/abs/2603.02119) (`dataset/build_ppbench_*.py`, `dataset/build_multi_dataset.py`).
 
-Installation should take a few minutes. For the smallest experiments on Sudoku-Extreme (pretrain_mlp_t_sudoku), you need 1 GPU with enough memory. With 1 L40S (48Gb Ram), it takes around 18h to finish. In case that you run into issues due to library versions, here is the requirements with the exact versions used: [specific_requirements.txt](https://github.com/SamsungSAILMontreal/TinyRecursiveModels/blob/main/specific_requirements.txt).
+Training is unchanged from TRM.
 
-- Python 3.10 (or similar)
-- Cuda 12.6.0 (or similar)
+## Installation
+
+Python 3.10 and CUDA 12.6 (or similar).
 
 ```bash
 pip install --upgrade pip wheel setuptools
-pip install --pre --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu126 # install torch based on your cuda version
-pip install -r requirements.txt # install requirements
-pip install --no-cache-dir --no-build-isolation adam-atan2 
-wandb login YOUR-LOGIN # login if you want the logger to sync results to your Weights & Biases (https://wandb.ai/)
+pip install --pre --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu126  # match your CUDA version
+pip install -r requirements.txt
+pip install --no-cache-dir --no-build-isolation adam-atan2  # training only
 ```
 
-### Dataset Preparation
+## PTRM inference
 
 ```bash
-# ARC-AGI-1
-python -m dataset.build_arc_dataset \
-  --input-file-prefix kaggle/combined/arc-agi \
-  --output-dir data/arc1concept-aug-1000 \
-  --subsets training evaluation concept \
-  --test-set-name evaluation
+python ptrm.py --checkpoint <run_dir>/step_<N> --data-paths <dataset_dir> --K 100 --sigma 0.2
+```
 
-# ARC-AGI-2
-python -m dataset.build_arc_dataset \
-  --input-file-prefix kaggle/combined/arc-agi \
-  --output-dir data/arc2concept-aug-1000 \
-  --subsets training2 evaluation2 concept \
-  --test-set-name evaluation2
+- `--checkpoint`: a trained TRM checkpoint (its `all_config.yaml` must be in the same folder)
+- `--data-paths`: one or more dataset folders (evaluated on their test split)
+- `--K`: number of rollouts
+- `--sigma`: noise scale
 
-## Note: You cannot train on both ARC-AGI-1 and ARC-AGI-2 and evaluate them both because ARC-AGI-2 training data contains some ARC-AGI-1 eval data
+The script reports best-Q@K, mode@K and pass@K for each dataset.
 
+## Datasets
+
+```bash
 # Sudoku-Extreme
-python dataset/build_sudoku_dataset.py --output-dir data/sudoku-extreme-1k-aug-1000  --subsample-size 1000 --num-aug 1000  # 1000 examples, 1000 augments
+python dataset/build_sudoku_dataset.py --output-dir data/sudoku-extreme-1k-aug-1000 --subsample-size 1000 --num-aug 1000
 
 # Maze-Hard
-python dataset/build_maze_dataset.py # 1000 examples, 8 augments
+python dataset/build_maze_dataset.py
+
+# ARC-AGI-2
+python -m dataset.build_arc_dataset --input-file-prefix kaggle/combined/arc-agi --output-dir data/arc2concept-aug-1000 \
+  --subsets training2 evaluation2 concept --test-set-name evaluation2
 ```
 
-## Experiments
-
-### Sudoku-Extreme (assuming 1 L40S GPU):
+**PPBench** uses the [Pencil Puzzle Bench](https://github.com/approximatelabs/pencil-puzzle-bench) package, which needs Node.js, and its full dataset from Hugging Face:
 
 ```bash
-run_name="pretrain_mlp_t_sudoku"
-python pretrain.py \
-arch=trm \
-data_paths="[data/sudoku-extreme-1k-aug-1000]" \
-evaluators="[]" \
-epochs=50000 eval_interval=5000 \
-lr=1e-4 puzzle_emb_lr=1e-4 weight_decay=1.0 puzzle_emb_weight_decay=1.0 \
-arch.mlp_t=True arch.pos_encodings=none \
-arch.L_layers=2 \
-arch.H_cycles=3 arch.L_cycles=6 \
-+run_name=${run_name} ema=True
-
-Expected: Around 87% exact-accuracy (+- 2%)
-
-run_name="pretrain_att_sudoku"
-python pretrain.py \
-arch=trm \
-data_paths="[data/sudoku-extreme-1k-aug-1000]" \
-evaluators="[]" \
-epochs=50000 eval_interval=5000 \
-lr=1e-4 puzzle_emb_lr=1e-4 weight_decay=1.0 puzzle_emb_weight_decay=1.0 \
-arch.L_layers=2 \
-arch.H_cycles=3 arch.L_cycles=6 \
-+run_name=${run_name} ema=True
+pip install ppbench huggingface_hub
+hf download bluecoconut/pencil-puzzle-bench full_dataset.jsonl --repo-type dataset \
+  --local-dir $(python -c "import ppbench, os; print(os.path.dirname(ppbench.__file__))")/data
 ```
 
-Expected: Around 75% exact-accuracy (+- 2%)
-
-*Runtime:* < 20 hours
-
-### Maze-Hard (assuming 4 L40S GPUs):
+We train on six puzzle types (sudoku, lightup, nurikabe, shakashaka, heyawake, tapa) and report five (TRM already solves all shakashaka puzzles). Each builder writes the training and validation splits and, in `<output-dir>-golden`, the benchmark's golden set; the merge step then combines the six types into one dataset with a shared vocabulary:
 
 ```bash
-run_name="pretrain_att_maze30x30"
-torchrun --nproc-per-node 4 --rdzv_backend=c10d --rdzv_endpoint=localhost:0 --nnodes=1 pretrain.py \
-arch=trm \
-data_paths="[data/maze-30x30-hard-1k]" \
-evaluators="[]" \
-epochs=50000 eval_interval=5000 \
-lr=1e-4 puzzle_emb_lr=1e-4 weight_decay=1.0 puzzle_emb_weight_decay=1.0 \
-arch.L_layers=2 \
-arch.H_cycles=3 arch.L_cycles=4 \
-+run_name=${run_name} ema=True
+python dataset/build_ppbench_sudoku.py --output-dir data/ppbench-sudoku-aug10 --num-augs 10 --val-size 100
+python dataset/build_ppbench_lightup.py --output-dir data/ppbench-lightup-aug10 --num-augs 10 --val-size 100
+python dataset/build_ppbench_nurikabe.py --output-dir data/ppbench-nurikabe-aug10 --num-augs 10 --val-size 100 --max-clue 30
+python dataset/build_ppbench_shakashaka.py --output-dir data/ppbench-shakashaka-aug10 --num-augs 10 --val-size 100
+python dataset/build_ppbench_heyawake.py --output-dir data/ppbench-heyawake-aug10 --num-augs 10 --val-size 100 --max-clue 10
+python dataset/build_ppbench_tapa.py --output-dir data/ppbench-tapa-aug10 --num-augs 10 --val-size 50
+
+types="sudoku lightup nurikabe shakashaka heyawake tapa"
+python dataset/build_multi_dataset.py --output-dir data/ppbench-multi-aug10 \
+  --puzzle-dirs $(for p in $types; do echo $p=data/ppbench-$p-aug10; done) \
+  --golden-dirs $(for p in $types; do echo $p=data/ppbench-$p-aug10-golden; done)
 ```
 
-*Runtime:* < 24 hours
+This writes the training set (`data/ppbench-multi-aug10`, whose test split is the validation set) and one folder per puzzle type for evaluation (`data/ppbench-multi-aug10-{val,golden}-<type>`).
 
-Actually, you can run Maze-Hard with 1 L40S GPU by reducing the batch-size with no noticable loss in performance:
+## Training (unchanged from TRM)
+
+Sudoku-Extreme:
 
 ```bash
-run_name="pretrain_att_maze30x30_1gpu"
-python pretrain.py \
-arch=trm \
-data_paths="[data/maze-30x30-hard-1k]" \
-evaluators="[]" \
-epochs=50000 eval_interval=5000 \
-lr=1e-4 puzzle_emb_lr=1e-4 weight_decay=1.0 puzzle_emb_weight_decay=1.0 global_batch_size=128 \
-arch.L_layers=2 \
-arch.H_cycles=3 arch.L_cycles=4 \
-+run_name=${run_name} ema=True
+python pretrain.py arch=trm data_paths="[data/sudoku-extreme-1k-aug-1000]" evaluators="[]" \
+  epochs=50000 eval_interval=5000 lr=1e-4 puzzle_emb_lr=1e-4 weight_decay=1.0 puzzle_emb_weight_decay=1.0 \
+  arch.mlp_t=True arch.pos_encodings=none arch.L_layers=2 arch.H_cycles=3 arch.L_cycles=6 \
+  +run_name=pretrain_mlp_t_sudoku ema=True
 ```
 
-*Runtime:* < 24 hours
-
-
-### ARC-AGI-1 (assuming 4 H-100 GPUs):
+Maze-Hard:
 
 ```bash
-run_name="pretrain_att_arc1concept_4"
-torchrun --nproc-per-node 4 --rdzv_backend=c10d --rdzv_endpoint=localhost:0 --nnodes=1 pretrain.py \
-arch=trm \
-data_paths="[data/arc1concept-aug-1000]" \
-arch.L_layers=2 \
-arch.H_cycles=3 arch.L_cycles=4 \
-+run_name=${run_name} ema=True
-
+python pretrain.py arch=trm data_paths="[data/maze-30x30-hard-1k]" evaluators="[]" \
+  epochs=50000 eval_interval=5000 lr=1e-4 puzzle_emb_lr=1e-4 weight_decay=1.0 puzzle_emb_weight_decay=1.0 \
+  global_batch_size=128 arch.L_layers=2 arch.H_cycles=3 arch.L_cycles=4 +run_name=pretrain_att_maze30x30_1gpu ema=True
 ```
 
-*Runtime:* ~3 days
-
-### ARC-AGI-2 (assuming 4 H-100 GPUs):
+PPBench:
 
 ```bash
-run_name="pretrain_att_arc2concept_4"
-torchrun --nproc-per-node 4 --rdzv_backend=c10d --rdzv_endpoint=localhost:0 --nnodes=1 pretrain.py \
-arch=trm \
-data_paths="[data/arc2concept-aug-1000]" \
-arch.L_layers=2 \
-arch.H_cycles=3 arch.L_cycles=4 \
-+run_name=${run_name} ema=True
-
+python pretrain.py arch=trm data_paths="[data/ppbench-multi-aug10]" evaluators="[]" \
+  epochs=50000 eval_interval=16 global_batch_size=512 lr=1e-4 puzzle_emb_lr=1e-4 weight_decay=1.0 puzzle_emb_weight_decay=1.0 \
+  arch.pos_encodings=rope2d +run_name=pretrain_att_ppbench ema=True
 ```
 
-*Runtime:* ~3 days
+See the [TRM repository](https://github.com/SamsungSAILMontreal/TinyRecursiveModels) for ARC-AGI and multi-GPU commands.
 
-
-## Reference
-
-If you find our work useful, please consider citing:
+## Citation
 
 ```bibtex
-@misc{jolicoeurmartineau2025morerecursivereasoningtiny,
-      title={Less is More: Recursive Reasoning with Tiny Networks}, 
-      author={Alexia Jolicoeur-Martineau},
-      year={2025},
-      eprint={2510.04871},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2510.04871}, 
-}
-```
-
-and the Hierarchical Reasoning Model (HRM):
-
-```bibtex
-@misc{wang2025hierarchicalreasoningmodel,
-      title={Hierarchical Reasoning Model}, 
-      author={Guan Wang and Jin Li and Yuhao Sun and Xing Chen and Changling Liu and Yue Wu and Meng Lu and Sen Song and Yasin Abbasi Yadkori},
-      year={2025},
-      eprint={2506.21734},
+@misc{sghaier2026probabilistictinyrecursivemodel,
+      title={Probabilistic Tiny Recursive Model},
+      author={Amin Sghaier and Ali Parviz and Alexia Jolicoeur-Martineau},
+      year={2026},
+      eprint={2605.19943},
       archivePrefix={arXiv},
       primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2506.21734}, 
+      url={https://arxiv.org/abs/2605.19943},
 }
 ```
 
-This code is based on the Hierarchical Reasoning Model [code](https://github.com/sapientinc/HRM) and the Hierarchical Reasoning Model Analysis [code](https://github.com/arcprize/hierarchical-reasoning-model-analysis).
+This code builds on [TRM](https://github.com/SamsungSAILMontreal/TinyRecursiveModels), which is based on the [Hierarchical Reasoning Model](https://github.com/sapientinc/HRM) code.
